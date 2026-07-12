@@ -539,6 +539,9 @@ const localApi = {
             purchaseDate: data.purchaseDate !== undefined ? data.purchaseDate : plants[index].purchaseDate,
             purchasePlace: data.purchasePlace !== undefined ? data.purchasePlace : plants[index].purchasePlace,
             memo: data.memo !== undefined ? data.memo : plants[index].memo,
+            locationId: data.locationId !== undefined ? parseInt(data.locationId) : plants[index].locationId,
+            isDead: data.isDead !== undefined ? data.isDead : plants[index].isDead,
+            deadDate: data.deadDate !== undefined ? data.deadDate : plants[index].deadDate,
         };
         storage._set('pd_plants', plants);
         return plants[index];

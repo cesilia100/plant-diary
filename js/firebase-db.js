@@ -150,7 +150,7 @@ const firebaseApi = {
 
     async updatePlant(id, data) {
         const updates = {};
-        for (const key of ['name', 'imageUrl', 'price', 'purchaseDate', 'purchasePlace', 'memo', 'locationId']) {
+        for (const key of ['name', 'imageUrl', 'price', 'purchaseDate', 'purchasePlace', 'memo', 'locationId', 'isDead', 'deadDate']) {
             if (data[key] !== undefined) updates[key] = data[key];
         }
         await firebaseDb.update(`plants/${id}`, updates);

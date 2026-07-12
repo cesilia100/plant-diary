@@ -223,7 +223,7 @@ async function openPlantDetail(plantId) {
         // 고사 버튼 텍스트 변경
         const deadBtn = document.getElementById('btn-dead-plant');
         if (deadBtn) {
-            deadBtn.textContent = isDead ? '🌱 복원' : '💀 고사';
+            deadBtn.textContent = isDead ? '🌱 회생' : '💀 고사';
         }
 
         content.innerHTML = `
@@ -1414,7 +1414,7 @@ function loginLocalAdmin() {
 // 편집 권한 UI 업데이트: 관리자가 아니면 편집 버튼 숨김
 function updateEditPermission() {
     const editButtons = document.querySelectorAll(
-        '#btn-add-location, #btn-add-plant, #btn-add-shop, #btn-edit-plant, #btn-delete-plant, #btn-move-plant, .btn-bulk-care, .card-actions .btn-danger, .card-actions .btn-outline'
+        '#btn-add-location, #btn-add-plant, #btn-add-shop, #btn-edit-plant, #btn-delete-plant, #btn-move-plant, #btn-dead-plant, .btn-bulk-care, .card-actions .btn-danger, .card-actions .btn-outline'
     );
     editButtons.forEach(btn => {
         if (btn) btn.style.display = isAdmin ? '' : 'none';
@@ -1728,17 +1728,8 @@ async function movePlantToLocation(plantId, newLocationId, locationName) {
     const plant = await api.getPlant(plantId);
     if (!plant) return;
 
-    // locationId 업데이트
-    if (useLocalStorage) {
-        const plants = storage._get('pd_plants');
-        const index = plants.findIndex(p => p.id === parseInt(plantId));
-        if (index !== -1) {
-            plants[index].locationId = parseInt(newLocationId);
-            storage._set('pd_plants', plants);
-        }
-    } else {
-        await api.updatePlant(plantId, { ...plant, locationId: newLocationId });
-    }
+    // locationId 업데이트 (모든 모드 통합)
+    await api.updatePlant(plantId, { locationId: newLocationId });
 
     document.getElementById('modal-move-plant').classList.remove('active');
     showBulkToast(`📦 "${plant.name}"이(가) "${locationName}"으로 이동했습니다!`);
@@ -2099,10 +2090,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!plant) return;
 
         if (plant.isDead) {
-            // 이미 고사 상태 → 복원
-            if (!confirm(`"${plant.name}"을(를) 다시 활성화하시겠습니까?`)) return;
-            await api.updatePlant(currentPlantId, { isDead: false });
-            showBulkToast('🌱 식물이 복원되었습니다!');
+            // 이미 고사 상태 → 회생
+            if (!confirm(`"${plant.name}"을(를) 회생시키겠습니까?`)) return;
+            await api.updatePlant(currentPlantId, { isDead: false, deadDate: null });
+            showBulkToast('🌱 회생되었습니다! 다시 관리할 수 있습니다.');
         } else {
             // 고사 처리
             if (!confirm(`"${plant.name}"을(를) 고사 처리하시겠습니까?\n(상세 내용이 비활성화됩니다)`)) return;
