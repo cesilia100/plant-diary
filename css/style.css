@@ -349,6 +349,22 @@ body {
     user-select: none;
 }
 
+/* 고사 버튼 영역 (페이지 하단) */
+.dead-button-area {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px dashed #e0e0e0;
+}
+
+.btn-dead {
+    background: #616161;
+    color: white;
+}
+
+.btn-dead:hover {
+    background: #424242;
+}
+
 .btn-back {
     background: var(--color-surface);
     color: var(--color-text);
