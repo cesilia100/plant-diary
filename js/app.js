@@ -1135,9 +1135,14 @@ async function loadAdminName() {
     // 로컬 모드
     const name = localStorage.getItem('pd_admin_name');
     if (name) {
-        isAdmin = true;
-        greetingEl.textContent = `🧑‍🌾 ${name}님의 식물일기`;
-        greetingEl.classList.add('has-name');
+        // isAdmin은 로그인/세션복원에 의해서만 설정됨 (여기서 변경하지 않음)
+        if (isAdmin) {
+            greetingEl.textContent = `🧑‍🌾 ${name}님의 식물일기`;
+            greetingEl.classList.add('has-name');
+        } else {
+            greetingEl.textContent = '🔒 로그인';
+            greetingEl.classList.remove('has-name');
+        }
     } else {
         greetingEl.textContent = '⚙️ 관리자 설정';
         greetingEl.classList.remove('has-name');
@@ -1329,9 +1334,11 @@ function saveLocalAdmin() {
     if (name) {
         localStorage.setItem('pd_admin_name', name);
         isAdmin = true;
+        sessionStorage.setItem('pd_admin_logged', 'true');
     } else {
         localStorage.removeItem('pd_admin_name');
         isAdmin = false;
+        sessionStorage.removeItem('pd_admin_logged');
     }
     document.getElementById('modal-auth').classList.remove('active');
     loadAdminName();
