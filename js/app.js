@@ -82,7 +82,6 @@ async function loadLocations() {
                 </div>
                 <div class="card-actions">
                     <button class="btn btn-sm btn-outline" onclick="editLocation('${loc.id}', '${escapeAttr(loc.name)}', '${escapeAttr(loc.description || '')}')">수정</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteLocation('${loc.id}', '${escapeAttr(loc.name)}')">삭제</button>
                 </div>
             </div>
         `}).join('');
