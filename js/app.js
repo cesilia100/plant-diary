@@ -74,15 +74,15 @@ async function loadLocations() {
                             ${moreCount > 0 ? `<div class="plant-icon-more">+${moreCount}</div>` : ''}
                         </div>
                         <div class="bulk-care-row">
-                            <button class="btn-bulk-care water" onclick="event.stopPropagation(); bulkCare(${loc.id}, 'water')" title="전체 물주기">💧</button>
-                            <button class="btn-bulk-care repot" onclick="event.stopPropagation(); bulkCare(${loc.id}, 'repot')" title="전체 분갈이">🪴</button>
-                            <button class="btn-bulk-care pest" onclick="event.stopPropagation(); bulkCare(${loc.id}, 'pest')" title="전체 병충해">🐛</button>
+                            <button class="btn-bulk-care water" onclick="event.stopPropagation(); bulkCare('${loc.id}', 'water')" title="전체 물주기">💧</button>
+                            <button class="btn-bulk-care repot" onclick="event.stopPropagation(); bulkCare('${loc.id}', 'repot')" title="전체 분갈이">🪴</button>
+                            <button class="btn-bulk-care pest" onclick="event.stopPropagation(); bulkCare('${loc.id}', 'pest')" title="전체 병충해">🐛</button>
                         </div>
                     ` : ''}
                 </div>
                 <div class="card-actions">
-                    <button class="btn btn-sm btn-outline" onclick="editLocation(${loc.id}, '${escapeAttr(loc.name)}', '${escapeAttr(loc.description || '')}')">수정</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteLocation(${loc.id}, '${escapeAttr(loc.name)}')">삭제</button>
+                    <button class="btn btn-sm btn-outline" onclick="editLocation('${loc.id}', '${escapeAttr(loc.name)}', '${escapeAttr(loc.description || '')}')">수정</button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteLocation('${loc.id}', '${escapeAttr(loc.name)}')">삭제</button>
                 </div>
             </div>
         `}).join('');
