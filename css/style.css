@@ -1271,14 +1271,16 @@ body {
 .schedule-section {
     margin-top: var(--spacing-lg);
     padding: var(--spacing-md);
-    background: var(--color-surface);
+    background: #ffffff;
     border-radius: var(--radius-lg);
-    border: 1px solid var(--color-border);
+    border: 1px solid #e0e0e0;
+    color: #212121;
 }
 
 .schedule-section h3 {
     font-size: var(--font-lg);
     margin-bottom: var(--spacing-md);
+    color: #212121;
 }
 
 .schedule-cards {
@@ -1289,9 +1291,10 @@ body {
 }
 
 .schedule-card {
-    border: 1px solid var(--color-border);
+    border: 1px solid #e0e0e0;
     border-radius: var(--radius-md);
     overflow: hidden;
+    background: #ffffff;
 }
 
 .schedule-card.water { border-top: 3px solid #2196F3; }
@@ -1302,9 +1305,10 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: var(--spacing-sm) var(--spacing-md);
-    background: var(--color-bg);
+    background: #f5f5f5;
     font-weight: 600;
     font-size: var(--font-md);
+    color: #212121;
 }
 
 .schedule-card-body {
@@ -1314,7 +1318,7 @@ body {
 .schedule-card-body label {
     display: block;
     font-size: var(--font-sm);
-    color: var(--color-text-secondary);
+    color: #757575;
     margin-top: var(--spacing-sm);
     margin-bottom: 2px;
 }
@@ -1322,23 +1326,24 @@ body {
 .sched-input {
     width: 100%;
     padding: 6px 10px;
-    border: 1px solid var(--color-border);
+    border: 1px solid #e0e0e0;
     border-radius: var(--radius-sm);
     font-size: var(--font-md);
-    color: var(--color-text);
+    color: #212121;
+    background: #ffffff;
 }
 
 .sched-input:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: #4CAF50;
 }
 
 .sched-next {
     font-size: var(--font-sm);
-    color: var(--color-primary-dark);
+    color: #1565C0;
     margin-top: var(--spacing-sm);
     padding: 4px 8px;
-    background: var(--color-primary-light);
+    background: #e3f2fd;
     border-radius: var(--radius-sm);
 }
 
