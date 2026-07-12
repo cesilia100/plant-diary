@@ -184,7 +184,7 @@ async function loadPlants() {
             return;
         }
         list.innerHTML = `<div class="plant-list-view">${plants.map(plant => `
-            <div class="plant-list-item" onclick="openPlantDetail('${plant.id}')">
+            <div class="plant-list-item${plant.isDead ? ' plant-dead' : ''}" onclick="openPlantDetail('${plant.id}')">
                 <div class="plant-list-thumb">
                     ${plant.imageUrl
                         ? `<img src="${api.getImageUrl(plant.imageUrl)}" alt="${escapeAttr(plant.name)}">`
@@ -192,7 +192,7 @@ async function loadPlants() {
                     }
                 </div>
                 <div class="plant-list-info">
-                    <h3 class="plant-list-name">${escapeHtml(plant.name)}</h3>
+                    <h3 class="plant-list-name">${escapeHtml(plant.name)}${plant.isDead ? ' <span class="dead-tag">💀 고사</span>' : ''}</h3>
                     <div class="plant-list-meta">
                         ${plant.purchaseDate ? `<span>📅 ${formatDate(plant.purchaseDate)}</span>` : ''}
                         ${plant.purchasePlace ? `<span>🏪 ${escapeHtml(plant.purchasePlace)}</span>` : ''}
@@ -218,8 +218,17 @@ async function openPlantDetail(plantId) {
     try {
         const plant = await api.getPlant(plantId);
         const schedule = getPlantSchedule(plantId);
+        const isDead = plant.isDead === true;
+
+        // 고사 버튼 텍스트 변경
+        const deadBtn = document.getElementById('btn-dead-plant');
+        if (deadBtn) {
+            deadBtn.textContent = isDead ? '🌱 복원' : '💀 고사';
+        }
 
         content.innerHTML = `
+            ${isDead ? `<div class="dead-overlay"><span class="dead-badge">💀 고사 (${plant.deadDate || ''})</span></div>` : ''}
+            <div class="${isDead ? 'dead-content' : ''}">`;
             <div class="detail-image" id="detail-image-area">
                 ${plant.imageUrl
                     ? `<img src="${api.getImageUrl(plant.imageUrl)}" alt="${escapeAttr(plant.name)}" id="detail-img">`
@@ -2076,6 +2085,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (error) {
             alert(error.message);
         }
+    });
+
+    // 고사 처리
+    document.getElementById('btn-dead-plant').addEventListener('click', async () => {
+        const plant = await api.getPlant(currentPlantId);
+        if (!plant) return;
+
+        if (plant.isDead) {
+            // 이미 고사 상태 → 복원
+            if (!confirm(`"${plant.name}"을(를) 다시 활성화하시겠습니까?`)) return;
+            await api.updatePlant(currentPlantId, { isDead: false });
+            showBulkToast('🌱 식물이 복원되었습니다!');
+        } else {
+            // 고사 처리
+            if (!confirm(`"${plant.name}"을(를) 고사 처리하시겠습니까?\n(상세 내용이 비활성화됩니다)`)) return;
+            await api.updatePlant(currentPlantId, { isDead: true, deadDate: new Date().toISOString().split('T')[0] });
+            showBulkToast('💀 고사 처리되었습니다.');
+        }
+        await openPlantDetail(currentPlantId);
     });
 
     // 통계
