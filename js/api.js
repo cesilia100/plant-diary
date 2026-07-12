@@ -7,6 +7,15 @@
  * 3. 인터넷도 없을 때 → LocalStorage (해당 기기에만 저장)
  */
 
+// AbortSignal.timeout 폴리필 (구형 브라우저 지원)
+if (!AbortSignal.timeout) {
+    AbortSignal.timeout = function(ms) {
+        const controller = new AbortController();
+        setTimeout(() => controller.abort(), ms);
+        return controller.signal;
+    };
+}
+
 // ============ 설정 ============
 const API_BASE = '/api';
 const PYTHON_API = '/api';
@@ -27,16 +36,21 @@ let storageMode = 'local';
 
 // 시작 시 연결 확인
 async function checkBackend() {
-    // 1. Python 서버 체크
-    try {
-        const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) });
-        if (res.ok) {
-            storageMode = 'server';
-            console.log('✅ 서버 연결됨 - 서버 모드');
-            await syncLocalToServer();
-            return;
-        }
-    } catch (e) {}
+    // 1. Python 서버 체크 (file:// 프로토콜이면 스킵)
+    if (window.location.protocol !== 'file:') {
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 2000);
+            const res = await fetch(`${API_BASE}/health`, { signal: controller.signal });
+            clearTimeout(timeout);
+            if (res.ok) {
+                storageMode = 'server';
+                console.log('✅ 서버 연결됨 - 서버 모드');
+                await syncLocalToServer();
+                return;
+            }
+        } catch (e) {}
+    }
 
     // 2. Firebase 체크
     if (typeof firebaseDb !== 'undefined' && firebaseDb.init()) {

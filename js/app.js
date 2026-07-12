@@ -1935,13 +1935,19 @@ function openMap(address) {
 // ============ 이벤트 리스너 ============
 
 document.addEventListener('DOMContentLoaded', async () => {
-    restoreSession();
-    await checkBackend();
-    loadAdminName();
-    loadWeather();
-    checkAllSchedules();
-    await loadLocations();
-    showCloudStatus();
+    try {
+        restoreSession();
+        await checkBackend();
+    } catch (e) {
+        console.warn('초기화 오류 (무시하고 계속):', e);
+        storageMode = 'local';
+    }
+
+    try { loadAdminName(); } catch(e) { console.warn('관리자 로드 실패:', e); }
+    try { loadWeather(); } catch(e) { console.warn('날씨 로드 실패:', e); }
+    try { checkAllSchedules(); } catch(e) { console.warn('스케줄 체크 실패:', e); }
+    try { await loadLocations(); } catch(e) { console.warn('장소 로드 실패:', e); }
+    try { showCloudStatus(); } catch(e) { console.warn('상태 표시 실패:', e); }
 
     // 장소 추가 버튼
     document.getElementById('btn-add-location').addEventListener('click', () => openLocationModal());

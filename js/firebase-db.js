@@ -19,9 +19,17 @@ const firebaseDb = {
     // ============ 기본 CRUD ============
 
     async get(path) {
-        const res = await fetch(`${this.baseUrl}/${path}.json`, { signal: AbortSignal.timeout(8000) });
-        if (!res.ok) throw new Error('Firebase 읽기 실패');
-        return await res.json();
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+        try {
+            const res = await fetch(`${this.baseUrl}/${path}.json`, { signal: controller.signal });
+            clearTimeout(timeout);
+            if (!res.ok) throw new Error('Firebase 읽기 실패');
+            return await res.json();
+        } catch (e) {
+            clearTimeout(timeout);
+            throw e;
+        }
     },
 
     async set(path, data) {
