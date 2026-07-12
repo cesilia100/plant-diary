@@ -1204,14 +1204,42 @@ function openAuthModal() {
             })
             .catch(() => {
                 // 로컬 모드
-                title.textContent = '👤 관리자 이름 설정';
-                body.innerHTML = `
-                    <div class="form-group">
-                        <label>이름</label>
-                        <input type="text" id="auth-name" placeholder="이름 입력" class="sched-input" value="${localStorage.getItem('pd_admin_name') || ''}">
-                    </div>
-                    <button class="btn btn-primary btn-full" onclick="saveLocalAdmin()">저장</button>
-                `;
+                const existingName = localStorage.getItem('pd_admin_name');
+                const hasPassword = !!localStorage.getItem('pd_admin_pass');
+
+                if (existingName && hasPassword) {
+                    // 이미 등록됨 → 비밀번호 로그인
+                    title.textContent = '🔐 관리자 로그인';
+                    body.innerHTML = `
+                        <p style="margin-bottom:12px;">편집 권한을 위해 비밀번호를 입력하세요.</p>
+                        <div class="form-group">
+                            <label>비밀번호</label>
+                            <input type="password" id="auth-password" placeholder="비밀번호 입력" class="sched-input">
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="loginLocalAdmin()">로그인</button>
+                        <p style="margin-top:12px; font-size:0.8rem; color:var(--color-text-secondary);">※ 로그인하지 않아도 정보를 볼 수 있습니다</p>
+                    `;
+                    setTimeout(() => document.getElementById('auth-password')?.focus(), 100);
+                } else {
+                    // 처음 등록 → 이름 + 비밀번호 설정
+                    title.textContent = '⚙️ 관리자 초기 설정';
+                    body.innerHTML = `
+                        <p style="margin-bottom:12px;">관리자 이름과 비밀번호를 설정하세요.<br>설정 후 다른 사람은 읽기만 가능합니다.</p>
+                        <div class="form-group">
+                            <label>관리자 이름</label>
+                            <input type="text" id="auth-name" placeholder="예: 홍길동" class="sched-input" maxlength="20">
+                        </div>
+                        <div class="form-group">
+                            <label>비밀번호</label>
+                            <input type="password" id="auth-password" placeholder="비밀번호 설정" class="sched-input">
+                        </div>
+                        <div class="form-group">
+                            <label>비밀번호 확인</label>
+                            <input type="password" id="auth-password2" placeholder="비밀번호 다시 입력" class="sched-input">
+                        </div>
+                        <button class="btn btn-primary btn-full" onclick="saveLocalAdmin()">설정 완료</button>
+                    `;
+                }
             });
     }
 
@@ -1311,6 +1339,17 @@ async function changePassword() {
     if (newPass !== newPass2) { alert('새 비밀번호가 일치하지 않습니다.'); return; }
     if (newPass.length < 4) { alert('비밀번호는 4자 이상이어야 합니다.'); return; }
 
+    // 로컬 모드
+    if (storageMode === 'local' || storageMode === 'firebase' || storageMode === 'cloud') {
+        const savedPass = localStorage.getItem('pd_admin_pass');
+        if (current !== savedPass) { alert('현재 비밀번호가 틀렸습니다.'); return; }
+        localStorage.setItem('pd_admin_pass', newPass);
+        document.getElementById('modal-auth').classList.remove('active');
+        showBulkToast('🔑 비밀번호가 변경되었습니다.');
+        return;
+    }
+
+    // 서버 모드
     try {
         const res = await fetch('/api/auth/change-password', {
             method: 'POST',
@@ -1331,16 +1370,35 @@ async function changePassword() {
 
 function saveLocalAdmin() {
     const name = document.getElementById('auth-name').value.trim();
-    if (name) {
-        localStorage.setItem('pd_admin_name', name);
-        isAdmin = true;
-        sessionStorage.setItem('pd_admin_logged', 'true');
-    } else {
-        localStorage.removeItem('pd_admin_name');
-        isAdmin = false;
-        sessionStorage.removeItem('pd_admin_logged');
-    }
+    const pass = document.getElementById('auth-password')?.value || '';
+    const pass2 = document.getElementById('auth-password2')?.value || '';
+
+    if (!name) { alert('이름을 입력해주세요.'); return; }
+    if (!pass) { alert('비밀번호를 입력해주세요.'); return; }
+    if (pass !== pass2) { alert('비밀번호가 일치하지 않습니다.'); return; }
+    if (pass.length < 4) { alert('비밀번호는 4자 이상으로 설정해주세요.'); return; }
+
+    localStorage.setItem('pd_admin_name', name);
+    localStorage.setItem('pd_admin_pass', pass);
+    isAdmin = true;
+    sessionStorage.setItem('pd_admin_logged', 'true');
     document.getElementById('modal-auth').classList.remove('active');
+    showBulkToast('✅ 관리자 설정 완료!');
+    loadAdminName();
+}
+
+function loginLocalAdmin() {
+    const pass = document.getElementById('auth-password').value;
+    const savedPass = localStorage.getItem('pd_admin_pass');
+
+    if (!pass) { alert('비밀번호를 입력해주세요.'); return; }
+    if (pass !== savedPass) { alert('비밀번호가 틀렸습니다.'); return; }
+
+    isAdmin = true;
+    sessionStorage.setItem('pd_admin_logged', 'true');
+    document.getElementById('modal-auth').classList.remove('active');
+    const name = localStorage.getItem('pd_admin_name') || '관리자';
+    showBulkToast(`🧑‍🌾 ${name}님 환영합니다!`);
     loadAdminName();
 }
 
