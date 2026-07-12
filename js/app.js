@@ -184,7 +184,7 @@ async function loadPlants() {
             return;
         }
         list.innerHTML = `<div class="plant-list-view">${plants.map(plant => `
-            <div class="plant-list-item" onclick="openPlantDetail(${plant.id})">
+            <div class="plant-list-item" onclick="openPlantDetail('${plant.id}')">
                 <div class="plant-list-thumb">
                     ${plant.imageUrl
                         ? `<img src="${api.getImageUrl(plant.imageUrl)}" alt="${escapeAttr(plant.name)}">`
@@ -1068,7 +1068,7 @@ async function searchPlants(query) {
             return;
         }
         results.innerHTML = plants.map(plant => `
-            <div class="search-item" onclick="document.getElementById('modal-search').classList.remove('active'); openPlantDetail(${plant.id});">
+            <div class="search-item" onclick="document.getElementById('modal-search').classList.remove('active'); openPlantDetail('${plant.id}');">
                 <strong>${escapeHtml(plant.name)}</strong>
                 ${plant.purchasePlace ? `<span class="search-place">📍 ${escapeHtml(plant.purchasePlace)}</span>` : ''}
                 ${plant.price ? `<span class="search-price">${formatPrice(plant.price)}원</span>` : ''}
@@ -1920,7 +1920,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await api.updatePlant(id, data);
                 document.getElementById('modal-plant').classList.remove('active');
                 // 수정 후 상세 페이지 갱신
-                await openPlantDetail(parseInt(id));
+                await openPlantDetail(id);
             } else {
                 await api.createPlant(data, currentLocationId);
                 document.getElementById('modal-plant').classList.remove('active');
