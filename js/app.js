@@ -726,15 +726,15 @@ function openDayPanel(plantId, dateStr, dayRecords, allRecords) {
                 <strong>${calMonth}월 ${d}일</strong> (${dayNames[dayOfWeek]})
             </div>
             <div class="lab-panel-buttons">
-                <button class="lab-care-btn${hasWater ? ' active' : ''}" data-type="water" onclick="toggleDayCare(${plantId}, '${dateStr}', 'water', ${!hasWater})">
+                <button class="lab-care-btn${hasWater ? ' active' : ''}" data-type="water" onclick="toggleDayCare('${plantId}', '${dateStr}', 'water', ${!hasWater})">
                     <span class="lab-care-icon">💧</span>
                     <span class="lab-care-label">물주기</span>
                 </button>
-                <button class="lab-care-btn${hasRepot ? ' active' : ''}" data-type="repot" onclick="toggleDayCare(${plantId}, '${dateStr}', 'repot', ${!hasRepot})">
+                <button class="lab-care-btn${hasRepot ? ' active' : ''}" data-type="repot" onclick="toggleDayCare('${plantId}', '${dateStr}', 'repot', ${!hasRepot})">
                     <span class="lab-care-icon">🪴</span>
                     <span class="lab-care-label">분갈이</span>
                 </button>
-                <button class="lab-care-btn${hasPest ? ' active' : ''}" data-type="pest" onclick="toggleDayCare(${plantId}, '${dateStr}', 'pest', ${!hasPest})">
+                <button class="lab-care-btn${hasPest ? ' active' : ''}" data-type="pest" onclick="toggleDayCare('${plantId}', '${dateStr}', 'pest', ${!hasPest})">
                     <span class="lab-care-icon">🐛</span>
                     <span class="lab-care-label">병충해</span>
                 </button>
@@ -742,7 +742,7 @@ function openDayPanel(plantId, dateStr, dayRecords, allRecords) {
             <div class="lab-panel-note">
                 <div class="lab-note-row">
                     <input type="text" id="lab-note-input" class="lab-note-input" placeholder="메모 입력..." value="${escapeAttr(noteText)}" maxlength="200">
-                    <button class="btn btn-sm btn-primary" onclick="saveDayNote(${plantId}, '${dateStr}')">저장</button>
+                    <button class="btn btn-sm btn-primary" onclick="saveDayNote('${plantId}', '${dateStr}')">저장</button>
                 </div>
             </div>
         </div>
