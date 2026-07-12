@@ -1,2 +1,3 @@
-# Firebase 설정 파일 (API Key 포함 - 공개 금지)
-js/firebase-config.js
+# 임시 파일
+*.tmp
+*.log
