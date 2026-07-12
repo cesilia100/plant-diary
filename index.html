@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌱 Plant Diary</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="img/icon-192.png">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="logo">🌱 Plant Diary</h1>
+                <div class="admin-name-area" id="admin-name-area">
+                    <span class="admin-greeting" id="admin-greeting" onclick="openAuthModal()">🔒 로그인</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" id="btn-stats">📊 통계</button>
+                <button class="btn btn-outline" id="btn-export">📥 CSV</button>
+                <button class="btn btn-outline" id="btn-shops">🏪 업체</button>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="식물 검색..." />
+                    <button class="btn btn-sm" id="btn-search">🔍</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- 오늘의 날씨 위젯 -->
+        <div class="weather-widget" id="weather-widget">
+            <div class="weather-loading">🌤️ 날씨 정보 로딩 중...</div>
+        </div>
+
+        <!-- 장소 목록 뷰 -->
+        <section id="view-locations" class="view active">
+            <div class="section-header">
+                <h2>내 장소</h2>
+                <button class="btn btn-primary" id="btn-add-location">+ 장소 추가</button>
+            </div>
+            <div class="card-grid" id="location-list"></div>
+        </section>
+
+        <!-- 식물 목록 뷰 -->
+        <section id="view-plants" class="view">
+            <div class="section-header">
+                <button class="btn btn-back" id="btn-back-locations">← 장소 목록</button>
+                <h2 id="plants-title">식물 목록</h2>
+                <button class="btn btn-primary" id="btn-add-plant">+ 식물 추가</button>
+            </div>
+            <div class="card-grid" id="plant-list"></div>
+        </section>
+
+        <!-- 식물 상세 뷰 -->
+        <section id="view-plant-detail" class="view">
+            <div class="section-header">
+                <button class="btn btn-back" id="btn-back-plants">← 식물 목록</button>
+                <div class="detail-actions">
+                    <button class="btn btn-solid-blue" id="btn-move-plant">📦 이동</button>
+                    <button class="btn btn-solid-green" id="btn-edit-plant">✏️ 수정</button>
+                    <button class="btn btn-danger" id="btn-delete-plant">🗑️ 삭제</button>
+                </div>
+            </div>
+            <div class="plant-detail" id="plant-detail-content"></div>
+        </section>
+
+        <!-- 장소 추가/수정 모달 -->
+        <div class="modal" id="modal-location">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modal-location-title">장소 추가</h3>
+                    <button class="btn-close" id="btn-close-location">&times;</button>
+                </div>
+                <form id="form-location">
+                    <div class="form-group">
+                        <label for="location-name">장소 이름 *</label>
+                        <input type="text" id="location-name" placeholder="예: 거실, 베란다, 사무실" required maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="location-desc">설명 (선택)</label>
+                        <textarea id="location-desc" placeholder="장소에 대한 간단한 설명" maxlength="255" rows="3"></textarea>
+                    </div>
+                    <input type="hidden" id="location-id">
+                    <button type="submit" class="btn btn-primary btn-full">저장</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 식물 추가/수정 모달 -->
+        <div class="modal" id="modal-plant">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3 id="modal-plant-title">식물 추가</h3>
+                    <button class="btn-close" id="btn-close-plant">&times;</button>
+                </div>
+                <form id="form-plant">
+                    <div class="form-row">
+                        <div class="image-upload-wrapper">
+                            <div class="image-upload" id="image-upload-area">
+                                <img id="plant-image-preview" src="" alt="" class="image-preview hidden">
+                                <div class="image-placeholder" id="image-placeholder">
+                                    <span>🖼️</span>
+                                    <p>갤러리</p>
+                                </div>
+                                <input type="file" id="plant-image-input" accept="image/*" hidden>
+                            </div>
+                            <button type="button" class="btn-camera-capture" id="btn-camera-capture">
+                                <span>📷</span>
+                                <p>촬영</p>
+                            </button>
+                            <input type="file" id="plant-camera-input" accept="image/*" capture hidden>
+                        </div>
+                        <div class="form-fields">
+                            <div class="form-group">
+                                <label for="plant-name">식물 이름 *</label>
+                                <input type="text" id="plant-name" placeholder="예: 몬스테라, 스투키" required maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label for="plant-price">가격 (원)</label>
+                                <input type="number" id="plant-price" placeholder="예: 15000" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="plant-date">구입 날짜</label>
+                                <input type="date" id="plant-date">
+                            </div>
+                            <div class="form-group">
+                                <label for="plant-place">구매한 곳</label>
+                                <input type="text" id="plant-place" placeholder="예: 꽃시장, 온라인" maxlength="200">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="plant-memo">메모</label>
+                        <textarea id="plant-memo" placeholder="물주기, 관리법 등 자유롭게 적어보세요" maxlength="500" rows="3"></textarea>
+                    </div>
+                    <input type="hidden" id="plant-id">
+                    <input type="hidden" id="plant-image-url">
+                    <button type="submit" class="btn btn-primary btn-full">저장</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 통계 모달 -->
+        <div class="modal" id="modal-stats">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3>📊 식물 통계</h3>
+                    <button class="btn-close" id="btn-close-stats">&times;</button>
+                </div>
+                <div id="stats-content" class="stats-content"></div>
+            </div>
+        </div>
+
+        <!-- 검색 결과 모달 -->
+        <div class="modal" id="modal-search">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3>🔍 검색 결과</h3>
+                    <button class="btn-close" id="btn-close-search">&times;</button>
+                </div>
+                <div id="search-results" class="search-results"></div>
+            </div>
+        </div>
+
+        <!-- 식물업체 목록 뷰 -->
+        <section id="view-shops" class="view">
+            <div class="section-header">
+                <button class="btn btn-back" id="btn-back-from-shops">← 메인</button>
+                <h2>🏪 자주가는 식물업체</h2>
+                <button class="btn btn-primary" id="btn-add-shop">+ 업체 추가</button>
+            </div>
+            <div class="shop-list" id="shop-list"></div>
+        </section>
+
+        <!-- 업체 추가/수정 모달 -->
+        <div class="modal" id="modal-shop">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h3 id="modal-shop-title">업체 추가</h3>
+                    <button class="btn-close" id="btn-close-shop">&times;</button>
+                </div>
+                <form id="form-shop">
+                    <div class="form-group">
+                        <label for="shop-name">업체명 *</label>
+                        <input type="text" id="shop-name" placeholder="예: 양재꽃시장, 플랜테리어샵" required maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="shop-category">분류</label>
+                        <select id="shop-category" class="form-select">
+                            <option value="flower-market">꽃시장</option>
+                            <option value="garden-center">가든센터</option>
+                            <option value="online">온라인 쇼핑몰</option>
+                            <option value="nursery">농원/화원</option>
+                            <option value="interior">플랜테리어샵</option>
+                            <option value="other">기타</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="shop-address">주소</label>
+                        <input type="text" id="shop-address" placeholder="예: 서울시 서초구 양재동 123" maxlength="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="shop-phone">연락처</label>
+                        <input type="tel" id="shop-phone" placeholder="예: 02-1234-5678" maxlength="20">
+                    </div>
+                    <div class="form-group">
+                        <label for="shop-url">웹사이트/SNS</label>
+                        <input type="url" id="shop-url" placeholder="예: https://instagram.com/shop" maxlength="300">
+                    </div>
+                    <div class="form-group">
+                        <label for="shop-hours">영업시간</label>
+                        <input type="text" id="shop-hours" placeholder="예: 09:00~18:00 (월~토)" maxlength="100">
+                    </div>
+                    <div class="form-group">
+                        <label for="shop-memo">메모</label>
+                        <textarea id="shop-memo" placeholder="특이사항, 추천 품목, 할인 정보 등" maxlength="500" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="shop-rating">평점</label>
+                        <div class="rating-input" id="shop-rating-input">
+                            <span class="star" data-value="1">☆</span>
+                            <span class="star" data-value="2">☆</span>
+                            <span class="star" data-value="3">☆</span>
+                            <span class="star" data-value="4">☆</span>
+                            <span class="star" data-value="5">☆</span>
+                        </div>
+                        <input type="hidden" id="shop-rating" value="0">
+                    </div>
+                    <input type="hidden" id="shop-id">
+                    <button type="submit" class="btn btn-primary btn-full">저장</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 식물 장소 이동 모달 -->
+        <div class="modal" id="modal-move-plant">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📦 장소 이동</h3>
+                    <button class="btn-close" id="btn-close-move">&times;</button>
+                </div>
+                <p class="move-plant-desc" id="move-plant-desc"></p>
+                <div class="move-location-list" id="move-location-list"></div>
+            </div>
+        </div>
+
+        <!-- 로그인/관리자 설정 모달 -->
+        <div class="modal" id="modal-auth">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="auth-modal-title">🔐 관리자 로그인</h3>
+                    <button class="btn-close" id="btn-close-auth">&times;</button>
+                </div>
+                <div id="auth-modal-body">
+                    <!-- 동적 렌더링 -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>🌱 Plant Diary &copy; 2024 | Java + Python + CSS</p>
+    </footer>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-db.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
