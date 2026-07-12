@@ -228,7 +228,7 @@ async function openPlantDetail(plantId) {
 
         content.innerHTML = `
             ${isDead ? `<div class="dead-overlay"><span class="dead-badge">💀 고사 (${plant.deadDate || ''})</span></div>` : ''}
-            <div class="${isDead ? 'dead-content' : ''}">`;
+            <div class="${isDead ? 'dead-content' : ''}">
             <div class="detail-image" id="detail-image-area">
                 ${plant.imageUrl
                     ? `<img src="${api.getImageUrl(plant.imageUrl)}" alt="${escapeAttr(plant.name)}" id="detail-img">`
